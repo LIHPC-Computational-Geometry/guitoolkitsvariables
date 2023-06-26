@@ -1,0 +1,36 @@
+Version 1.3.0 : 23/06/23
+===============
+
+Sortie du projet GUIToolkits
+
+cmake/python_binding.cmake : 0.5.0 Support Python 2/Python 3, répertoire d'installation des modules python fourni par le python utilisé.
+cmake/XercesC.cmake renommé en cmake/FindXercesC.cmake, et affecte TRUE à XercesC_FOUND. Contenu refait, le FindXerces.cmake fourni par
+cmake 3.24.2 ne fonctionne pas.
+cmake/omniORB4.cmake renommé en cmake/FindomniORB4.cmake 
+
+
+Version 1.2.0 : 31/03/23
+===============
+
+Portage GitHub environnement podman/spack/tests CI.
+cmake/common_vtk.cmake : correctif propagation de USE_OPENGL_BACKEND et QVTK_WIDGET
+
+
+Version 1.1.1 : 03/02/23
+===============
+
+blindage versions Python dans cmake/python_binding.cmake
+
+
+Version 1.1.0 : 17/01/23
+===============
+
+Création de ce fichier versions.txt.
+
+Retouche cmake/python_binding.cmake : ajout -DPYTHON_MAJOR_VERSION.
+
+
+Version 1.0.0 : 12/01/23
+===============
+
+Création du projet.
