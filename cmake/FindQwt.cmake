@@ -146,11 +146,14 @@ mark_as_advanced (
 # CEA (ajout de la cible qwt pour le "cmake modern") :
 set (QWT_TARGET "qwt::qwt")
 
-add_library (${QWT_TARGET} SHARED IMPORTED)
-set_target_properties (qwt::qwt PROPERTIES
+if (NOT TARGET qwt::qwt)
+	add_library (${QWT_TARGET} SHARED IMPORTED)
+	set_target_properties (qwt::qwt PROPERTIES
 		INTERFACE_INCLUDE_DIRECTORIES ${QWT_INCLUDE_DIR}
 		IMPORTED_LOCATION ${QWT_LIBRARIES}
 #		INTERFACE_LINK_LIBRARIES ${QWT_LIBRARIES}	# A priori on y met plutôt les dépendances, par exemple les libs Qt*.
 	)
+endif (NOT TARGET qwt::qwt)
+
 # Fin CEA
 # =======================================================================================================================================
