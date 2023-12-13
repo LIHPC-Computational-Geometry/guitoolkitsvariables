@@ -1,3 +1,9 @@
+Version 1.4.1 : 13/12/23
+===============
+
+cmake/common_qt.cmake : correctif pour environnement spack.
+
+
 Version 1.4.0 : 13/12/23
 ===============
 
