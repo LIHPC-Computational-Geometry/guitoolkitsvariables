@@ -148,9 +148,26 @@ set (QWT_TARGET "qwt::qwt")
 
 if (NOT TARGET qwt::qwt)
 	add_library (${QWT_TARGET} SHARED IMPORTED)
+
+# Ajout dépendances Qt 5 ou 6 (issues des fichiers tests de qwt 6.2.0) :
+	include (${GUIToolkitsVariables_CMAKE_DIR}/common_qt.cmake)
+	find_package (Qt${QT_MAJOR}Widgets ${QT_MAJOR} REQUIRED NO_CMAKE_SYSTEM_PATH)
+	find_package (Qt${QT_MAJOR}Concurrent ${QT_MAJOR} REQUIRED NO_CMAKE_SYSTEM_PATH)
+	find_package (Qt${QT_MAJOR}PrintSupport ${QT_MAJOR} REQUIRED NO_CMAKE_SYSTEM_PATH)
+	find_package (Qt${QT_MAJOR}Svg ${QT_MAJOR} NO_CMAKE_SYSTEM_PATH)
+	find_package (Qt${QT_MAJOR}OpenGL ${QT_MAJOR} NO_CMAKE_SYSTEM_PATH)
+	set (QWT_QT_LINKED_LIBRARIES "Qt${QT_MAJOR}::Widgets;Qt${QT_MAJOR}::Concurrent;Qt${QT_MAJOR}::PrintSupport")
+	if (Qt5Svg_FOUND)
+		list (APPEND QWT_QT_LINKED_LIBRARIES "Qt${QT_MAJOR}::Svg")
+	endif (Qt5Svg_FOUND)
+	if (Qt5OpenGL_FOUND)
+		list (APPEND QWT_QT_LINKED_LIBRARIES "Qt${QT_MAJOR}::OpenGL")
+	endif (Qt5OpenGL_FOUND)
+	
 	set_target_properties (qwt::qwt PROPERTIES
 		INTERFACE_INCLUDE_DIRECTORIES ${QWT_INCLUDE_DIR}
 		IMPORTED_LOCATION ${QWT_LIBRARIES}
+		INTERFACE_LINK_LIBRARIES "${QWT_QT_LINKED_LIBRARIES}"
 #		INTERFACE_LINK_LIBRARIES ${QWT_LIBRARIES}	# A priori on y met plutôt les dépendances, par exemple les libs Qt*.
 	)
 endif (NOT TARGET qwt::qwt)
