@@ -1,3 +1,9 @@
+Version 1.4.3 : 12/01/24
+===============
+
+FindQwt.cmake gère les dépendances de Qwt à Qt.
+
+
 Version 1.4.1/1.4.2 : 13/12/23
 =====================
 
