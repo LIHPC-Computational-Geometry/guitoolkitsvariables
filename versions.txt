@@ -1,3 +1,11 @@
+Version 1.5.0 : 07/06/24
+===============
+
+cmake/utilities.cmake : divers utilitaires pour mise au point et informations.
+cmake/common_qt.cmake : QT_LIBRARY_PATH
+cmake/common_vtk.cmake : VTK_LIBRARY_PATH
+
+
 Version 1.4.3 : 12/01/24
 ===============
 
