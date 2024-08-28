@@ -1,4 +1,4 @@
-# Version 0.5 (21/6/23, support Python 2/Python 3, répertoire d'installation des modules python fourni par le python utilisé)
+# Version 0.6 (28/08/23, support Python 2/Python 3, répertoire d'installation des modules python fourni par le python utilisé)
 
 # Par défaut on utilise Python 2
 
@@ -9,6 +9,7 @@ find_package (SWIG 3 REQUIRED)
 #find_package (Python REQUIRED COMPONENTS Interpreter Development)	# Rem : Python3 a la priorité => inutilisé car empêche l'accès à Python2
 if (USE_PYTHON_3)
 	message (STATUS "========================================= UTILISATION DE PYTHON 3 =========================================")
+	set (Python3_FIND_STRATEGY LOCATION)	# Nécessaire pour python >= 3.10
 	find_package (Python3 REQUIRED COMPONENTS Interpreter Development)
 	set (Python_INCLUDE_DIRS ${Python3_INCLUDE_DIRS})
 	set (Python_EXECUTABLE ${Python3_EXECUTABLE})
@@ -45,7 +46,12 @@ macro (_set_from_python outvar python_code)
 	endif ( )
 endmacro ( )
 
-_set_from_python (_GET_PYTHON_SITEARCH "import sys; from distutils import sysconfig; sys.stdout.write (sysconfig.get_python_lib (plat_specific=True, standard_lib=False, prefix=''))")
+if (USE_PYTHON_3)	# ATTENTION, ne marche peut être pas pour 3.0 <= python < 3.12. Le cas échéant la commande du else doit convenir.
+	_set_from_python (_GET_PYTHON_SITEARCH "import os, sys, sysconfig; sitepackages=os.path.relpath (sysconfig.get_path('platlib'), sys.base_prefix); sys.stdout.write (sitepackages)")
+else (USE_PYTHON_3)
+	_set_from_python (_GET_PYTHON_SITEARCH "import sys; from distutils import sysconfig; sys.stdout.write (sysconfig.get_python_lib (plat_specific=True, standard_lib=False, prefix=''))")
+endif (USE_PYTHON_3)
+
 set (PYTHON_BINDING_DIR ${_GET_PYTHON_SITEARCH})
 set (CMAKE_PYTHON_RPATH_DIR ${CMAKE_INSTALL_PREFIX}/${_GET_PYTHON_SITEARCH})
 
