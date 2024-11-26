@@ -1,24 +1,17 @@
-# Version 0.6 (28/08/23, support Python 2/Python 3, répertoire d'installation des modules python fourni par le python utilisé)
+# Version 0.7 (26/11/24, support Python 2/Python 3, répertoire d'installation des modules python fourni par le python utilisé)
 
-# Par défaut on utilise Python 2
+# On utilise Python 3 sauf si python 2 est demandé
 
 include (GNUInstallDirs)
 find_package (SWIG 3 REQUIRED)
 
 
 #find_package (Python REQUIRED COMPONENTS Interpreter Development)	# Rem : Python3 a la priorité => inutilisé car empêche l'accès à Python2
-if (USE_PYTHON_3)
-	message (STATUS "========================================= UTILISATION DE PYTHON 3 =========================================")
-	set (Python3_FIND_STRATEGY LOCATION)	# Nécessaire pour python >= 3.10
-	find_package (Python3 REQUIRED COMPONENTS Interpreter Development)
-	set (Python_INCLUDE_DIRS ${Python3_INCLUDE_DIRS})
-	set (Python_EXECUTABLE ${Python3_EXECUTABLE})
-	set (Python_VERSION ${Python3_VERSION})
-	set (Python_LIBRARIES ${Python3_LIBRARIES})
-	set (Python_LIBRARY_DIRS ${Python3_LIBRARY_DIRS})
-	set (PYTHON_MAJOR_VERSION 3)
-elseif (USE_PYTHON_2)
+if (USE_PYTHON_2)
 	message (STATUS "========================================= UTILISATION DE PYTHON 2 =========================================")
+message (STATUS "======================> Python2_EXECUTABLE	=${Python2_EXECUTABLE}")
+message (STATUS "======================> Python2_INCLUDE_DIRS	=${Python2_INCLUDE_DIRS}")
+message (STATUS "======================> Python2_LIBRARIES	=${Python2_LIBRARIES}")
 	find_package (Python2 REQUIRED COMPONENTS Interpreter Development)
 	set (Python_INCLUDE_DIRS ${Python2_INCLUDE_DIRS})
 	set (Python_EXECUTABLE ${Python2_EXECUTABLE})
@@ -27,9 +20,17 @@ elseif (USE_PYTHON_2)
 	set (Python_LIBRARY_DIRS ${Python2_LIBRARY_DIRS})
 	set (PYTHON_MAJOR_VERSION 2)
 else ( )
-	message (STATUS "========================================= VERSION DE PYTHON NON DEFINIE =========================================")
-	message (FATAL_ERROR "==> UTILISEZ -DUSE_PYTHON_2 OU -DUSE_PYTHON_3 A LA LIGNE DE COMMANDE")
-endif (USE_PYTHON_3)
+	message (STATUS "========================================= UTILISATION DE PYTHON 3 =========================================")
+	set (USE_PYTHON_3 ON)
+	set (Python3_FIND_STRATEGY LOCATION)	# Nécessaire pour python >= 3.10
+	find_package (Python3 REQUIRED COMPONENTS Interpreter Development)
+	set (Python_INCLUDE_DIRS ${Python3_INCLUDE_DIRS})
+	set (Python_EXECUTABLE ${Python3_EXECUTABLE})
+	set (Python_VERSION ${Python3_VERSION})
+	set (Python_LIBRARIES ${Python3_LIBRARIES})
+	set (Python_LIBRARY_DIRS ${Python3_LIBRARY_DIRS})
+	set (PYTHON_MAJOR_VERSION 3)
+endif (USE_PYTHON_2)
 
 
 # Recherche du répertoire d'installation des modules (procédure spack organizer) : 
