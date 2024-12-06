@@ -1,36 +1,18 @@
-# Version 0.7 (26/11/24, support Python 2/Python 3, répertoire d'installation des modules python fourni par le python utilisé)
-
-# On utilise Python 3 sauf si python 2 est demandé
+# Version 0.8 (03/12/24, Python > 3.10, répertoire d'installation des modules python fourni par le python utilisé)
 
 include (GNUInstallDirs)
-find_package (SWIG 3 REQUIRED)
+find_package (SWIG 4 REQUIRED)
 
 
-#find_package (Python REQUIRED COMPONENTS Interpreter Development)	# Rem : Python3 a la priorité => inutilisé car empêche l'accès à Python2
-if (USE_PYTHON_2)
-	message (STATUS "========================================= UTILISATION DE PYTHON 2 =========================================")
-message (STATUS "======================> Python2_EXECUTABLE	=${Python2_EXECUTABLE}")
-message (STATUS "======================> Python2_INCLUDE_DIRS	=${Python2_INCLUDE_DIRS}")
-message (STATUS "======================> Python2_LIBRARIES	=${Python2_LIBRARIES}")
-	find_package (Python2 REQUIRED COMPONENTS Interpreter Development)
-	set (Python_INCLUDE_DIRS ${Python2_INCLUDE_DIRS})
-	set (Python_EXECUTABLE ${Python2_EXECUTABLE})
-	set (Python_VERSION ${Python2_VERSION})
-	set (Python_LIBRARIES ${Python2_LIBRARIES})
-	set (Python_LIBRARY_DIRS ${Python2_LIBRARY_DIRS})
-	set (PYTHON_MAJOR_VERSION 2)
-else ( )
-	message (STATUS "========================================= UTILISATION DE PYTHON 3 =========================================")
-	set (USE_PYTHON_3 ON)
-	set (Python3_FIND_STRATEGY LOCATION)	# Nécessaire pour python >= 3.10
-	find_package (Python3 REQUIRED COMPONENTS Interpreter Development)
-	set (Python_INCLUDE_DIRS ${Python3_INCLUDE_DIRS})
-	set (Python_EXECUTABLE ${Python3_EXECUTABLE})
-	set (Python_VERSION ${Python3_VERSION})
-	set (Python_LIBRARIES ${Python3_LIBRARIES})
-	set (Python_LIBRARY_DIRS ${Python3_LIBRARY_DIRS})
-	set (PYTHON_MAJOR_VERSION 3)
-endif (USE_PYTHON_2)
+message (STATUS "========================================= UTILISATION DE PYTHON 3 =========================================")
+set (Python3_FIND_STRATEGY LOCATION)	# Nécessaire pour python >= 3.10
+find_package (Python3 REQUIRED COMPONENTS Interpreter Development)
+set (Python_INCLUDE_DIRS ${Python3_INCLUDE_DIRS})
+set (Python_EXECUTABLE ${Python3_EXECUTABLE})
+set (Python_VERSION ${Python3_VERSION})
+set (Python_LIBRARIES ${Python3_LIBRARIES})
+set (Python_LIBRARY_DIRS ${Python3_LIBRARY_DIRS})
+set (PYTHON_MAJOR_VERSION 3)
 
 
 # Recherche du répertoire d'installation des modules (procédure spack organizer) : 
@@ -47,12 +29,12 @@ macro (_set_from_python outvar python_code)
 	endif ( )
 endmacro ( )
 
-if (USE_PYTHON_3)	# ATTENTION, ne marche peut être pas pour 3.0 <= python < 3.12. Le cas échéant la commande du else doit convenir.
-	_set_from_python (_GET_PYTHON_SITEARCH "import os, sys, sysconfig; sitepackages=os.path.relpath (sysconfig.get_path('platlib'), sys.base_prefix); sys.stdout.write (sitepackages)")
-else (USE_PYTHON_3)
-	_set_from_python (_GET_PYTHON_SITEARCH "import sys; from distutils import sysconfig; sys.stdout.write (sysconfig.get_python_lib (plat_specific=True, standard_lib=False, prefix=''))")
-endif (USE_PYTHON_3)
-
+# REM : en l'état actuel, sous ubuntu/debian, et avec un python installé dans le système, le répertoire est du type local/lib/python3.12/dist-packages
+# => installer un python dans /opt, ou utiliser un venv (mais pose problème avec omniidl ...).
+_set_from_python(
+    _GET_PYTHON_SITEARCH
+    "import sysconfig; print(sysconfig.get_path('platlib', vars=dict(base='', platbase='', prefix='')).lstrip('/\/\/\/\'))"
+)
 set (PYTHON_BINDING_DIR ${_GET_PYTHON_SITEARCH})
 set (CMAKE_PYTHON_RPATH_DIR ${CMAKE_INSTALL_PREFIX}/${_GET_PYTHON_SITEARCH})
 
