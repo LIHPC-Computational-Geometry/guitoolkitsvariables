@@ -5,7 +5,6 @@ find_package (SWIG 4 REQUIRED)
 
 
 message (STATUS "========================================= UTILISATION DE PYTHON 3 =========================================")
-set (USE_PYTHON_3 ON)
 set (Python3_FIND_STRATEGY LOCATION)	# Nécessaire pour python >= 3.10
 find_package (Python3 REQUIRED COMPONENTS Interpreter Development)
 set (Python_INCLUDE_DIRS ${Python3_INCLUDE_DIRS})
