@@ -1,3 +1,13 @@
+Version 1.6.1 : 06/08/26
+===============
+
+make/common_qt.cmake : on cherche tout d'abord à charger Qt 6 ou Qt 5 aux emplacements non système à l'aide des informations
+fournies à cmake (divers variables à la ligne de commande ou d'environnement).
+En cas de recherche infructueuses évalue alors les possibilités au niveau système.
+
+Corrige le chargement d'un Qt 6 système alors que dans le CMAKE_PREFIX_PATH on fournit un Qt 5.
+
+
 Version 1.6.0 : 06/12/24
 ===============
 
