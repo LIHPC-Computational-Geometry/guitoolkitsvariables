@@ -121,3 +121,68 @@ function (print_target_properties tgt)
 endfunction (print_target_properties)
 
 # =========================== ! print_target_properties ===========================
+
+
+# ============================ separate_debug_infos ============================
+
+#
+# Sépare les informations utiles au déboggage de la cible. Cette fonction n'est active que si
+# la variable SEPARATE_DEBUG_INFO existe et vaut TRUE.
+# Place les sources issus de srcdir dans srcdbgdir pour débogage. Ces sources ne sot accessibles
+# qu'aux membres du groupe ayant installé ce composant logiciel.
+#
+# ATTENTION : en cas d'installation de la cible dans un répertoire non au standard "cmake"
+# (CMAKE_INSTALL_BINDIR/CMAKE_INSTALL_LIBDIR) il convient de préciser préalablement son répertoire
+# relatif d'installation par rapport à CMAKE_INSTALL_PREFIX via un set_property la propriété 
+# INSTALL_DIR de la cible.
+#
+
+function (separate_debug_infos tgt srcdbgdir)
+
+	if (SEPARATE_DEBUG_INFO)
+
+	find_package (Debugedit REQUIRED)
+	if (NOT DEBUGEDIT_FOUND)
+		message (FATAL_ERROR "Debugedit program was not found.")
+	endif (NOT DEBUGEDIT_FOUND)
+
+#	print_target_properties (${tgt})
+	get_target_property (tgt_type ${tgt} TYPE)
+	get_target_property (tgt_install_dir ${tgt} INSTALL_DIR)
+	get_target_property (tgt_src_dir ${tgt} SOURCE_DIR)
+
+	# Le répertoire racine complet des sources de la cible :
+	get_filename_component (src_path "${tgt_src_dir}" DIRECTORY)
+	# Le répertoire "final" de la cible :
+	file (RELATIVE_PATH component_dir "${src_path}" "${tgt_src_dir}")
+	# => les sources seront récursivement recopiés dans ${srcdbgdir}/${component_dir}
+
+	add_custom_command (TARGET ${tgt}
+		COMMAND ${CMAKE_OBJCOPY} ARGS --only-keep-debug $<TARGET_FILE:${tgt}> $<TARGET_FILE:${tgt}>.dbg
+		COMMAND ${CMAKE_OBJCOPY} ARGS --strip-debug $<TARGET_FILE:${tgt}>
+		COMMAND ${DEBUGEDIT_EXE} ARGS -in $<TARGET_FILE:${tgt}>.dbg -b ${tgt_src_dir} -d ${srcdbgdir}/${component_dir}
+		COMMAND ${CMAKE_OBJCOPY} ARGS --add-gnu-debuglink $<TARGET_FILE:${tgt}>.dbg $<TARGET_FILE:${tgt}>
+		DEPENDS ${tgt}
+		POST_BUILD
+		)
+	
+	set (TGT_DBG $<TARGET_FILE:${tgt}>.dbg)
+
+	if (tgt_install_dir)
+		set (install_dir "${CMAKE_INSTALL_PREFIX}/${tgt_install_dir}")
+	elseif (${tgt_type} STREQUAL "EXECUTABLE")
+		set (install_dir "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}")
+	elseif (${tgt_type} MATCHES "LIBRARY")
+		set (install_dir "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
+	else ( )
+		message (FATAL_ERROR "separate_debug_infos. Undefined installation destination directory for target ${tgt} of type ${tgt_type}.")
+	endif ( )
+
+	install (FILES ${TGT_DBG} DESTINATION ${install_dir} PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_WRITE GROUP_EXECUTE)
+	install (DIRECTORY ${tgt_src_dir} DIRECTORY_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_WRITE GROUP_EXECUTE SETGID DESTINATION "${srcdbgdir}")
+
+	endif (SEPARATE_DEBUG_INFO)
+
+endfunction (separate_debug_infos tgt dir)
+
+# =========================== ! separate_debug_infos ===========================

@@ -1,3 +1,13 @@
+Version 1.7.0 : 28/08/26
+===============
+
+Fonction separate_debug_infos pour générer un fichier contenant les informations de débogage qui soit séparé du binaire.
+Les fichiers sources sont installés à côté de la cible et les droits en lecture ne sont octroyés qu'au groupe qui a assuré
+leur installation. Les informations de débogage sont relocalisées en conséquence.
+Cette fonction n'est active que si la variable cmake SEPARATE_DEBUG_INFO est définie, et requiert la présence de l'utilitaire
+debugedit.
+
+
 Version 1.6.1 : 06/08/26
 ===============
 
